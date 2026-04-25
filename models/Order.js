@@ -23,8 +23,14 @@ const orderSchema = new mongoose.Schema({
   },
   customer: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
     required: true,
+    refPath: 'onModel',
+  },
+  onModel: {
+    type: String,
+    required: true,
+    enum: ['User', 'Customer'],
+    default: 'Customer',
   },
   businessId: {
     type: mongoose.Schema.Types.ObjectId,

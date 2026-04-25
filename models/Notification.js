@@ -16,9 +16,15 @@ const notificationSchema = new mongoose.Schema({
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
     required: true,
+    refPath: 'onModel',
     index: true,
+  },
+  onModel: {
+    type: String,
+    required: true,
+    enum: ['User', 'Customer'],
+    default: 'User',
   },
   businessId: {
     type: mongoose.Schema.Types.ObjectId,

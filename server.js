@@ -14,6 +14,7 @@ import orderRoutes from './routes/orderRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
 import ticketRoutes from './routes/ticketRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
+import customerAuthRoutes from './routes/customerAuthRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -39,6 +40,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/tickets', ticketRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/customer-auth', customerAuthRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
+import Customer from '../models/Customer.js';
 import env from '../config/env.js';
 import { errorResponse } from '../utils/apiResponse.js';
 
@@ -13,7 +14,20 @@ export const protect = async (req, res, next) => {
       return errorResponse(res, 'Not authorized, no token', 401);
     }
     const decoded = jwt.verify(token, env.JWT_SECRET);
-    const user = await User.findById(decoded.id).select('-password');
+    
+    // Try finding in User first (Admins)
+    let user = await User.findById(decoded.id).select('-password');
+    let userModel = 'User';
+    
+    // If not found, try finding in Customer
+    if (!user) {
+      user = await Customer.findById(decoded.id).select('-password');
+      if (user) {
+        user.role = 'customer'; 
+        userModel = 'Customer';
+      }
+    }
+
     if (!user) {
       return errorResponse(res, 'User not found', 401);
     }
@@ -21,6 +35,7 @@ export const protect = async (req, res, next) => {
       return errorResponse(res, 'Account is deactivated', 401);
     }
     req.user = user;
+    req.userModel = userModel;
     next();
   } catch (error) {
     return errorResponse(res, 'Not authorized, token failed', 401);
@@ -44,7 +59,17 @@ export const optionalAuth = async (req, res, next) => {
     }
     if (token) {
       const decoded = jwt.verify(token, env.JWT_SECRET);
-      req.user = await User.findById(decoded.id).select('-password');
+      let user = await User.findById(decoded.id).select('-password');
+      let userModel = 'User';
+      if (!user) {
+        user = await Customer.findById(decoded.id).select('-password');
+        if (user) {
+          user.role = 'customer';
+          userModel = 'Customer';
+        }
+      }
+      req.user = user;
+      req.userModel = userModel;
     }
     next();
   } catch {

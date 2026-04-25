@@ -1,7 +1,8 @@
 import { Router } from 'express';
-import { createProduct, getProducts, getProduct, updateProduct, deleteProduct, getPublicProducts, getPublicProduct } from '../controllers/productController.js';
+import { createProduct, getProducts, getProduct, updateProduct, deleteProduct, getPublicProducts, getPublicProduct, bulkCreateProducts } from '../controllers/productController.js';
 import { protect, authorize } from '../middleware/auth.js';
 import { resolveTenant } from '../middleware/tenantResolver.js';
+import upload from '../middleware/upload.js';
 
 const router = Router();
 
@@ -10,6 +11,7 @@ router.get('/public/:businessSlug', resolveTenant, getPublicProducts);
 router.get('/public/:businessSlug/:id', resolveTenant, getPublicProduct);
 
 // Admin routes
+router.post('/bulk', protect, authorize('admin'), upload.single('file'), bulkCreateProducts);
 router.post('/', protect, authorize('admin'), createProduct);
 router.get('/', protect, authorize('admin'), getProducts);
 router.get('/:id', protect, authorize('admin'), getProduct);

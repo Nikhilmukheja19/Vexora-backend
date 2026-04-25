@@ -1,5 +1,7 @@
 import Product from '../models/Product.js';
 import { successResponse, errorResponse } from '../utils/apiResponse.js';
+import XLSX from 'xlsx';
+import fs from 'fs';
 
 export const createProduct = async (req, res, next) => {
   try {
@@ -119,6 +121,54 @@ export const getPublicProduct = async (req, res, next) => {
     if (!product) return errorResponse(res, 'Product not found', 404);
     successResponse(res, { product });
   } catch (error) {
+    next(error);
+  }
+};
+export const bulkCreateProducts = async (req, res, next) => {
+  try {
+    if (!req.file) {
+      return errorResponse(res, 'No file uploaded', 400);
+    }
+
+    const workbook = XLSX.readFile(req.file.path);
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+    const data = XLSX.utils.sheet_to_json(sheet);
+
+    if (data.length === 0) {
+      return errorResponse(res, 'The uploaded file is empty', 400);
+    }
+
+    // Map and validate data
+    const productsToCreate = data.map(item => ({
+      name: item.Name || item.name,
+      description: item.Description || item.description || '',
+      price: Number(item.Price || item.price),
+      comparePrice: Number(item.ComparePrice || item.comparePrice || 0),
+      category: item.Category || item.category || 'uncategorized',
+      stock: Number(item.Stock || item.stock || 0),
+      sku: item.SKU || item.sku || '',
+      images: item.ImageURL || item.image || [],
+      businessId: req.user.businessId,
+      isActive: true,
+    }));
+
+    // Filter out invalid products (missing name or price)
+    const validProducts = productsToCreate.filter(p => p.name && !isNaN(p.price));
+
+    if (validProducts.length === 0) {
+      return errorResponse(res, 'No valid products found in the file. Ensure you have "Name" and "Price" columns.', 400);
+    }
+
+    const products = await Product.insertMany(validProducts);
+
+    // Clean up uploaded file
+    fs.unlinkSync(req.file.path);
+
+    successResponse(res, { count: products.length }, `${products.length} products imported successfully`, 201);
+  } catch (error) {
+    // Attempt to clean up file on error
+    if (req.file) fs.unlink(req.file.path, () => {});
     next(error);
   }
 };
