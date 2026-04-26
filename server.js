@@ -1,20 +1,20 @@
-import express from 'express';
-import cors from 'cors';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import connectDB from './config/db.js';
-import env from './config/env.js';
-import errorHandler from './middleware/errorHandler.js';
+import express from "express";
+import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
+import connectDB from "./config/db.js";
+import env from "./config/env.js";
+import errorHandler from "./middleware/errorHandler.js";
 
 // Route imports
-import authRoutes from './routes/authRoutes.js';
-import businessRoutes from './routes/businessRoutes.js';
-import productRoutes from './routes/productRoutes.js';
-import orderRoutes from './routes/orderRoutes.js';
-import chatRoutes from './routes/chatRoutes.js';
-import ticketRoutes from './routes/ticketRoutes.js';
-import notificationRoutes from './routes/notificationRoutes.js';
-import customerAuthRoutes from './routes/customerAuthRoutes.js';
+import authRoutes from "./routes/authRoutes.js";
+import businessRoutes from "./routes/businessRoutes.js";
+import productRoutes from "./routes/productRoutes.js";
+import orderRoutes from "./routes/orderRoutes.js";
+import chatRoutes from "./routes/chatRoutes.js";
+import ticketRoutes from "./routes/ticketRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
+import customerAuthRoutes from "./routes/customerAuthRoutes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -22,29 +22,31 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 // Middleware
-app.use(cors({
-  origin: env.CLIENT_URL,
-  credentials: true,
-}));
-app.use(express.json({ limit: '10mb' }));
+app.use(
+  cors({
+    origin: "https://vexoraaa.netlify.app/",
+    credentials: true,
+  }),
+);
+app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 
 // Static files for uploads
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // API Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/business', businessRoutes);
-app.use('/api/products', productRoutes);
-app.use('/api/orders', orderRoutes);
-app.use('/api/chat', chatRoutes);
-app.use('/api/tickets', ticketRoutes);
-app.use('/api/notifications', notificationRoutes);
-app.use('/api/customer-auth', customerAuthRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/business", businessRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/orders", orderRoutes);
+app.use("/api/chat", chatRoutes);
+app.use("/api/tickets", ticketRoutes);
+app.use("/api/notifications", notificationRoutes);
+app.use("/api/customer-auth", customerAuthRoutes);
 
 // Health check
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
 // Error handler
