@@ -2,6 +2,7 @@ import Business from '../models/Business.js';
 import Order from '../models/Order.js';
 import Product from '../models/Product.js';
 import User from '../models/User.js';
+import Customer from '../models/Customer.js';
 import Ticket from '../models/Ticket.js';
 import { successResponse, errorResponse } from '../utils/apiResponse.js';
 
@@ -17,13 +18,19 @@ export const getBusinessProfile = async (req, res, next) => {
 
 export const updateBusiness = async (req, res, next) => {
   try {
-    const updates = req.body;
-    delete updates.owner;
-    delete updates.slug;
+    const { 
+      name, description, category, contactEmail, contactPhone, 
+      address, theme, settings, socialLinks 
+    } = req.body;
     
     const business = await Business.findByIdAndUpdate(
       req.user.businessId,
-      { $set: updates },
+      { 
+        $set: { 
+          name, description, category, contactEmail, contactPhone, 
+          address, theme, settings, socialLinks 
+        } 
+      },
       { new: true, runValidators: true }
     );
     if (!business) return errorResponse(res, 'Business not found', 404);
@@ -43,7 +50,7 @@ export const getDashboardStats = async (req, res, next) => {
     const [totalOrders, totalProducts, totalCustomers, totalTickets, recentOrders, previousOrders, revenue, previousRevenue] = await Promise.all([
       Order.countDocuments({ businessId }),
       Product.countDocuments({ businessId }),
-      User.countDocuments({ businessId, role: 'customer' }),
+      Customer.countDocuments({ businessId }),
       Ticket.countDocuments({ businessId }),
       Order.countDocuments({ businessId, createdAt: { $gte: thirtyDaysAgo } }),
       Order.countDocuments({ businessId, createdAt: { $gte: sixtyDaysAgo, $lt: thirtyDaysAgo } }),
