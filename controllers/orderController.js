@@ -153,8 +153,16 @@ export const updateOrderStatus = async (req, res, next) => {
 
 export const getCustomerOrders = async (req, res, next) => {
   try {
-    const { page = 1, limit = 20 } = req.query;
+    const { page = 1, limit = 20, businessSlug } = req.query;
     const query = { customer: req.user._id };
+
+    if (businessSlug) {
+      const business = await Business.findOne({ slug: businessSlug });
+      if (business) {
+        query.businessId = business._id;
+      }
+    }
+
     const total = await Order.countDocuments(query);
     const orders = await Order.find(query)
       .populate("businessId", "name slug")
