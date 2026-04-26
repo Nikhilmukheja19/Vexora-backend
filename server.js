@@ -24,7 +24,7 @@ const app = express();
 // Middleware
 app.use(
   cors({
-    origin: "https://vexoraaa.netlify.app/",
+    origin: "https://vexoraaa.netlify.app",
     credentials: true,
   }),
 );
