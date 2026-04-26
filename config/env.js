@@ -12,7 +12,7 @@ const env = {
   SMTP_PORT: process.env.SMTP_PORT || 587,
   SMTP_USER: process.env.SMTP_USER || "",
   SMTP_PASS: process.env.SMTP_PASS || "",
-  CLIENT_URL: process.env.CLIENT_URL || "http://localhost:5173",
+  CLIENT_URL: process.env.CLIENT_URL || "https://vexoraaa.netlify.app/",
   NODE_ENV: process.env.NODE_ENV || "development",
 };
 
