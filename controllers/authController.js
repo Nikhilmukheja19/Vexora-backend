@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { body } from 'express-validator';
 import User from '../models/User.js';
+import Customer from '../models/Customer.js';
 import Business from '../models/Business.js';
 import env from '../config/env.js';
 import { successResponse, errorResponse } from '../utils/apiResponse.js';
@@ -105,7 +106,19 @@ export const login = async (req, res, next) => {
 
 export const getProfile = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user._id).populate('businessId');
+    let user;
+    if (req.userModel === 'Customer') {
+      user = await Customer.findById(req.user._id).populate('businessId');
+    } else {
+      user = await User.findById(req.user._id).populate('businessId');
+    }
+    
+    // Add role if it's a customer (since it's not in the schema)
+    if (req.userModel === 'Customer' && user) {
+      user = user.toObject();
+      user.role = 'customer';
+    }
+
     successResponse(res, { user });
   } catch (error) {
     next(error);
@@ -115,11 +128,27 @@ export const getProfile = async (req, res, next) => {
 export const updateProfile = async (req, res, next) => {
   try {
     const { name, phone, avatar } = req.body;
-    const user = await User.findByIdAndUpdate(
-      req.user._id,
-      { name, phone, avatar },
-      { new: true, runValidators: true }
-    );
+    let user;
+    
+    if (req.userModel === 'Customer') {
+      user = await Customer.findByIdAndUpdate(
+        req.user._id,
+        { name, phone },
+        { new: true, runValidators: true }
+      );
+    } else {
+      user = await User.findByIdAndUpdate(
+        req.user._id,
+        { name, phone, avatar },
+        { new: true, runValidators: true }
+      );
+    }
+    
+    if (req.userModel === 'Customer' && user) {
+      user = user.toObject();
+      user.role = 'customer';
+    }
+
     successResponse(res, { user }, 'Profile updated');
   } catch (error) {
     next(error);
