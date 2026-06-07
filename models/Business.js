@@ -49,9 +49,39 @@ const businessSchema = new mongoose.Schema({
     country: { type: String, default: '' },
   },
   theme: {
+    templateId: {
+      type: String,
+      default: 'classic',
+      enum: ['classic', 'ocean', 'sunset', 'forest', 'midnight', 'rose'],
+    },
     primaryColor: { type: String, default: '#6366f1' },
     secondaryColor: { type: String, default: '#8b5cf6' },
     accentColor: { type: String, default: '#06b6d4' },
+    heroStyle: {
+      type: String,
+      default: 'gradient',
+      enum: ['gradient', 'wave', 'minimal', 'dark'],
+    },
+    cardStyle: {
+      type: String,
+      default: 'rounded',
+      enum: ['rounded', 'soft', 'sharp', 'bold'],
+    },
+    headerStyle: {
+      type: String,
+      default: 'standard',
+      enum: ['standard', 'centered', 'minimal'],
+    },
+    buttonStyle: {
+      type: String,
+      default: 'rounded',
+      enum: ['rounded', 'pill', 'sharp'],
+    },
+    footerStyle: {
+      type: String,
+      default: 'standard',
+      enum: ['standard', 'minimal', 'branded'],
+    },
     darkMode: { type: Boolean, default: false },
   },
   socialLinks: {
